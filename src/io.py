@@ -52,7 +52,7 @@ def ingest_raw_csvs(
     add_source_file: bool = True,
     normalize_columns: bool = True,
 ) -> IngestResult:
-     """
+    """
     Load all raw CSV files under `raw_dir` into a single dataframe.
 
     This function does the following:
@@ -68,6 +68,7 @@ def ingest_raw_csvs(
           - files_read: list of successfully loaded file paths
           - files_failed: list of (path, error) tuples for failures
     """
+    raw_dir = Path(raw_dir)
     csv_paths = discover_csvs(raw_dir)
     if not csv_paths:
         raise FileNotFoundError(f"No CSVs found under {Path(raw_dir).resolve()}")
@@ -95,8 +96,9 @@ def ingest_raw_csvs(
 
     if not frames:
         raise RuntimeError(f"All CSV reads failed. First error: {files_failed[0] if files_failed else 'unknown'}")
-    
+
     # Concatenate all CSVs into a single wide table.
     # sort=False preserves original column ordering across files.
     combined = pd.concat(frames, ignore_index=True, sort=False)
+
     return IngestResult(df=combined, files_read=files_read, files_failed=files_failed)
